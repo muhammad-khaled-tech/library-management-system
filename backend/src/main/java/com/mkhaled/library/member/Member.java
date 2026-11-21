@@ -26,6 +26,11 @@ public class Member {
         this.email = email;
     }
 
+    public void updateDetails(String fullName, String email) {
+        this.fullName = fullName;
+        this.email = email;
+    }
+
     public Long getId() {
         return id;
     }
