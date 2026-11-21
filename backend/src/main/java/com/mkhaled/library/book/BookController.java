@@ -1,6 +1,8 @@
 package com.mkhaled.library.book;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedModel;
@@ -20,6 +22,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 
+@Tag(name = "Books")
 @RestController
 @RequestMapping("/api/books")
 public class BookController {
@@ -32,7 +35,7 @@ public class BookController {
 
     @GetMapping
     public PagedModel<BookResponse> list(@RequestParam(required = false) String q,
-                                         @PageableDefault(size = 20, sort = "title") Pageable pageable) {
+                                         @ParameterObject @PageableDefault(size = 20, sort = "title") Pageable pageable) {
         return new PagedModel<>(bookService.search(q, pageable));
     }
 

@@ -1,6 +1,8 @@
 package com.mkhaled.library.loan;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -16,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 
+@Tag(name = "Loans")
 @RestController
 @RequestMapping("/api/loans")
 public class LoanController {
@@ -27,9 +30,10 @@ public class LoanController {
     }
 
     @GetMapping
-    public PagedModel<LoanResponse> list(LoanSearchCriteria criteria,
-                                         @PageableDefault(size = 20, sort = "borrowedOn", direction = Sort.Direction.DESC)
-                                         Pageable pageable) {
+    public PagedModel<LoanResponse> list(
+            @ParameterObject LoanSearchCriteria criteria,
+            @ParameterObject @PageableDefault(size = 20, sort = "borrowedOn", direction = Sort.Direction.DESC)
+            Pageable pageable) {
         return new PagedModel<>(loanService.search(criteria, pageable));
     }
 

@@ -1,6 +1,8 @@
 package com.mkhaled.library.author;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedModel;
@@ -20,6 +22,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 
+@Tag(name = "Authors")
 @RestController
 @RequestMapping("/api/authors")
 public class AuthorController {
@@ -32,7 +35,7 @@ public class AuthorController {
 
     @GetMapping
     public PagedModel<AuthorResponse> list(@RequestParam(required = false) String name,
-                                           @PageableDefault(size = 20, sort = "name") Pageable pageable) {
+                                           @ParameterObject @PageableDefault(size = 20, sort = "name") Pageable pageable) {
         return new PagedModel<>(authorService.search(name, pageable));
     }
 

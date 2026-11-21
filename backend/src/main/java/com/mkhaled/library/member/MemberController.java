@@ -1,6 +1,8 @@
 package com.mkhaled.library.member;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedModel;
@@ -20,6 +22,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 
+@Tag(name = "Members")
 @RestController
 @RequestMapping("/api/members")
 public class MemberController {
@@ -32,7 +35,7 @@ public class MemberController {
 
     @GetMapping
     public PagedModel<MemberResponse> list(@RequestParam(required = false) String q,
-                                           @PageableDefault(size = 20, sort = "fullName") Pageable pageable) {
+                                           @ParameterObject @PageableDefault(size = 20, sort = "fullName") Pageable pageable) {
         return new PagedModel<>(memberService.search(q, pageable));
     }
 
