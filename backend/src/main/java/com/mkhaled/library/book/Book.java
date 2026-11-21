@@ -66,6 +66,20 @@ public class Book {
         this.availableCopies = newTotal - onLoan;
     }
 
+    public void checkOut() {
+        if (availableCopies == 0) {
+            throw new BusinessRuleException("No copies of \"" + title + "\" are available");
+        }
+        availableCopies--;
+    }
+
+    public void returnCopy() {
+        if (availableCopies == totalCopies) {
+            throw new IllegalStateException("No copy of book " + id + " is on loan");
+        }
+        availableCopies++;
+    }
+
     public Long getId() {
         return id;
     }

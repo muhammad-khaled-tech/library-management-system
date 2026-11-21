@@ -3,7 +3,6 @@ package com.mkhaled.library.book;
 import com.mkhaled.library.author.Author;
 import com.mkhaled.library.common.exception.BusinessRuleException;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -14,14 +13,49 @@ class BookTest {
 
     @Test
     void newBookHasAllCopiesAvailable() {
-        Book book = new Book("9780306406157", "Palace Walk", 1956, 3, author);
+        assertThat(book(3).getAvailableCopies()).isEqualTo(3);
+    }
 
-        assertThat(book.getAvailableCopies()).isEqualTo(3);
+    @Test
+    void checkOutTakesOneCopy() {
+        Book book = book(2);
+
+        book.checkOut();
+
+        assertThat(book.getAvailableCopies()).isEqualTo(1);
+    }
+
+    @Test
+    void checkOutFailsWhenNoCopiesAreAvailable() {
+        Book book = book(1);
+        book.checkOut();
+
+        assertThatThrownBy(book::checkOut)
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("No copies of \"Palace Walk\" are available");
+        assertThat(book.getAvailableCopies()).isZero();
+    }
+
+    @Test
+    void returnCopyPutsOneCopyBack() {
+        Book book = book(2);
+        book.checkOut();
+
+        book.returnCopy();
+
+        assertThat(book.getAvailableCopies()).isEqualTo(2);
+    }
+
+    @Test
+    void returnCopyFailsWhenNoCopyIsOnLoan() {
+        assertThatThrownBy(book(2)::returnCopy).isInstanceOf(IllegalStateException.class);
     }
 
     @Test
     void changeTotalCopiesKeepsCopiesOnLoan() {
-        Book book = bookWithCopiesOnLoan(3, 2);
+        Book book = book(3);
+        book.checkOut();
+        book.checkOut();
 
         book.changeTotalCopies(5);
 
@@ -31,7 +65,9 @@ class BookTest {
 
     @Test
     void changeTotalCopiesRejectsFewerCopiesThanAreOnLoan() {
-        Book book = bookWithCopiesOnLoan(3, 2);
+        Book book = book(3);
+        book.checkOut();
+        book.checkOut();
 
         assertThatThrownBy(() -> book.changeTotalCopies(1))
                 .isInstanceOf(BusinessRuleException.class)
@@ -40,9 +76,7 @@ class BookTest {
         assertThat(book.getAvailableCopies()).isEqualTo(1);
     }
 
-    private Book bookWithCopiesOnLoan(int total, int onLoan) {
-        Book book = new Book("9780306406157", "Palace Walk", 1956, total, author);
-        ReflectionTestUtils.setField(book, "availableCopies", total - onLoan);
-        return book;
+    private Book book(int copies) {
+        return new Book("9780306406157", "Palace Walk", 1956, copies, author);
     }
 }

@@ -111,7 +111,8 @@ class BookServiceTest {
     @Test
     void updateChangesDetailsAndKeepsCopiesOnLoan() {
         Book existing = book(10L, ISBN, 3);
-        ReflectionTestUtils.setField(existing, "availableCopies", 1);
+        existing.checkOut();
+        existing.checkOut();
         when(bookRepository.findById(10L)).thenReturn(Optional.of(existing));
         when(authorRepository.findById(1L)).thenReturn(Optional.of(mahfouz));
 
