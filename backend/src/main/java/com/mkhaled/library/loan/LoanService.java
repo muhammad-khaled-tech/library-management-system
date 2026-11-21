@@ -8,6 +8,8 @@ import com.mkhaled.library.member.Member;
 import com.mkhaled.library.member.MemberRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +38,12 @@ public class LoanService {
         this.memberRepository = memberRepository;
         this.policy = policy;
         this.clock = clock;
+    }
+
+    public Page<LoanResponse> search(LoanSearchCriteria criteria, Pageable pageable) {
+        LocalDate today = LocalDate.now(clock);
+        return loanRepository.findAll(LoanSpecifications.matching(criteria, today), pageable)
+                .map(loan -> LoanResponse.from(loan, today));
     }
 
     public LoanResponse get(Long id) {

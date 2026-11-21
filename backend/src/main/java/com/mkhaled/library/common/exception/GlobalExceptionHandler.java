@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -70,10 +71,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   WebRequest request) {
         Map<String, String> errors = new LinkedHashMap<>();
         ex.getBindingResult().getFieldErrors()
-                .forEach(error -> errors.putIfAbsent(error.getField(), error.getDefaultMessage()));
+                .forEach(error -> errors.putIfAbsent(error.getField(), messageFor(error)));
 
         ProblemDetail problem = ex.getBody();
         problem.setProperty("errors", errors);
         return handleExceptionInternal(ex, problem, headers, status, request);
+    }
+
+    // A failed type conversion (e.g. status=LOST) would otherwise expose Java class names to the client
+    private static String messageFor(FieldError error) {
+        return error.isBindingFailure()
+                ? "Invalid value '" + error.getRejectedValue() + "'"
+                : error.getDefaultMessage();
     }
 }

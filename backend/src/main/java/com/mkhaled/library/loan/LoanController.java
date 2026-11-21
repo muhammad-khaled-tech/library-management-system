@@ -1,6 +1,10 @@
 package com.mkhaled.library.loan;
 
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +24,13 @@ public class LoanController {
 
     public LoanController(LoanService loanService) {
         this.loanService = loanService;
+    }
+
+    @GetMapping
+    public PagedModel<LoanResponse> list(LoanSearchCriteria criteria,
+                                         @PageableDefault(size = 20, sort = "borrowedOn", direction = Sort.Direction.DESC)
+                                         Pageable pageable) {
+        return new PagedModel<>(loanService.search(criteria, pageable));
     }
 
     @GetMapping("/{id}")

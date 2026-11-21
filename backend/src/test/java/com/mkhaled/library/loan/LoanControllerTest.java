@@ -5,6 +5,9 @@ import com.mkhaled.library.common.exception.BusinessRuleException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -12,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -33,6 +37,27 @@ class LoanControllerTest {
 
     @MockitoBean
     private LoanService loanService;
+
+    @Test
+    void listBindsFiltersAndShowsNewestLoansFirst() throws Exception {
+        PageRequest expectedPage = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "borrowedOn"));
+        when(loanService.search(new LoanSearchCriteria(3L, null, LoanStatus.OVERDUE), expectedPage))
+                .thenReturn(new PageImpl<>(List.of(ACTIVE_LOAN), expectedPage, 1));
+
+        mockMvc.perform(get("/api/loans").param("memberId", "3").param("status", "OVERDUE"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(50))
+                .andExpect(jsonPath("$.page.totalElements").value(1));
+    }
+
+    @Test
+    void listRejectsUnknownStatus() throws Exception {
+        mockMvc.perform(get("/api/loans").param("status", "LOST"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.status").value("Invalid value 'LOST'"));
+
+        verifyNoInteractions(loanService);
+    }
 
     @Test
     void borrowReturns201WithLocation() throws Exception {
