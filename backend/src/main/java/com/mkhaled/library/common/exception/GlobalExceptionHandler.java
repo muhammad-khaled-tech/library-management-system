@@ -2,6 +2,8 @@ package com.mkhaled.library.common.exception;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -34,6 +36,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(BusinessRuleException.class)
     ProblemDetail handleBusinessRule(BusinessRuleException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    // Two requests changed the same row (e.g. both took the last copy); the @Version check stopped the second
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    ProblemDetail handleConcurrentUpdate(OptimisticLockingFailureException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT,
+                "The record was changed by another request, please retry");
+    }
+
+    // A database constraint caught what the service checks missed, e.g. a duplicate ISBN sent twice at once
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    ProblemDetail handleConstraintViolation(DataIntegrityViolationException ex) {
+        log.warn("Database constraint violation: {}", ex.getMostSpecificCause().getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "The request conflicts with existing data");
     }
 
     @ExceptionHandler(PropertyReferenceException.class)

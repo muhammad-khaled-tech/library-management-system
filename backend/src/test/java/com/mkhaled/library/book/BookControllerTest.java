@@ -5,6 +5,7 @@ import com.mkhaled.library.common.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -88,6 +89,21 @@ class BookControllerTest {
                 .andExpect(jsonPath("$.errors.totalCopies").exists());
 
         verifyNoInteractions(bookService);
+    }
+
+    @Test
+    void createReturns409WhenTheDatabaseRejectsADuplicate() throws Exception {
+        when(bookService.create(any(BookRequest.class)))
+                .thenThrow(new DataIntegrityViolationException("duplicate key value violates unique constraint"));
+
+        mockMvc.perform(post("/api/books")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"isbn": "9780306406157", "title": "Palace Walk",
+                                 "totalCopies": 3, "authorId": 1}
+                                """))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.detail").value("The request conflicts with existing data"));
     }
 
     @Test

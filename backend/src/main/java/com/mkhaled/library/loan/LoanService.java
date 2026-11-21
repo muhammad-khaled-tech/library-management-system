@@ -38,6 +38,10 @@ public class LoanService {
         this.clock = clock;
     }
 
+    public LoanResponse get(Long id) {
+        return LoanResponse.from(findLoan(id), LocalDate.now(clock));
+    }
+
     @Transactional
     public LoanResponse borrow(BorrowRequest request) {
         Member member = memberRepository.findWithLockById(request.memberId())
@@ -55,13 +59,16 @@ public class LoanService {
 
     @Transactional
     public LoanResponse returnLoan(Long loanId) {
-        Loan loan = loanRepository.findById(loanId)
-                .orElseThrow(() -> new ResourceNotFoundException("Loan", loanId));
-
+        Loan loan = findLoan(loanId);
         LocalDate today = LocalDate.now(clock);
         loan.markReturned(today, policy);
         log.info("Loan {} returned, late fee {}", loan.getId(), loan.getLateFee());
         return LoanResponse.from(loan, today);
+    }
+
+    private Loan findLoan(Long id) {
+        return loanRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Loan", id));
     }
 
     private void ensureBelowLoanLimit(Member member) {

@@ -120,6 +120,16 @@ class LoanServiceTest {
     }
 
     @Test
+    void getShowsOverdueStatusAfterTheDueDate() {
+        Loan loan = withId(Loan.borrow(palaceWalk, sara, MARCH_1, policy), 50L);
+        when(loanRepository.findById(50L)).thenReturn(Optional.of(loan));
+
+        LoanResponse response = serviceOn(LocalDate.of(2026, 3, 16)).get(50L);
+
+        assertThat(response.status()).isEqualTo(LoanStatus.OVERDUE);
+    }
+
+    @Test
     void returnThrowsWhenLoanDoesNotExist() {
         when(loanRepository.findById(99L)).thenReturn(Optional.empty());
 
