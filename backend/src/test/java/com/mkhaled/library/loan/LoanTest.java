@@ -52,6 +52,18 @@ class LoanTest {
     }
 
     @Test
+    void statusDependsOnDueDateAndReturn() {
+        Loan loan = Loan.borrow(book, member, MARCH_1, policy);
+
+        assertThat(loan.statusOn(LocalDate.of(2026, 3, 15))).isEqualTo(LoanStatus.ACTIVE);
+        assertThat(loan.statusOn(LocalDate.of(2026, 3, 16))).isEqualTo(LoanStatus.OVERDUE);
+
+        loan.markReturned(LocalDate.of(2026, 3, 16), policy);
+
+        assertThat(loan.statusOn(LocalDate.of(2026, 3, 20))).isEqualTo(LoanStatus.RETURNED);
+    }
+
+    @Test
     void aLoanCannotBeReturnedTwice() {
         Loan loan = Loan.borrow(book, member, MARCH_1, policy);
         loan.markReturned(LocalDate.of(2026, 3, 10), policy);

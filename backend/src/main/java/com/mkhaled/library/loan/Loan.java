@@ -66,6 +66,13 @@ public class Loan {
         return returnedOn == null;
     }
 
+    public LoanStatus statusOn(LocalDate today) {
+        if (!isActive()) {
+            return LoanStatus.RETURNED;
+        }
+        return today.isAfter(dueDate) ? LoanStatus.OVERDUE : LoanStatus.ACTIVE;
+    }
+
     public Long getId() {
         return id;
     }
