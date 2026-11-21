@@ -1,6 +1,7 @@
 package com.mkhaled.library.book;
 
 import com.mkhaled.library.author.Author;
+import com.mkhaled.library.common.exception.BusinessRuleException;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -46,6 +47,23 @@ public class Book {
         this.totalCopies = totalCopies;
         this.availableCopies = totalCopies;
         this.author = author;
+    }
+
+    public void updateDetails(String isbn, String title, Integer publishedYear, Author author) {
+        this.isbn = isbn;
+        this.title = title;
+        this.publishedYear = publishedYear;
+        this.author = author;
+    }
+
+    public void changeTotalCopies(int newTotal) {
+        int onLoan = totalCopies - availableCopies;
+        if (newTotal < onLoan) {
+            throw new BusinessRuleException(
+                    "Cannot set total copies to " + newTotal + ": " + onLoan + " copies are on loan");
+        }
+        this.totalCopies = newTotal;
+        this.availableCopies = newTotal - onLoan;
     }
 
     public Long getId() {
