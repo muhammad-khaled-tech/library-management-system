@@ -6,6 +6,13 @@ A full-stack app for running a small library: manage authors, books and members,
 
 Built with AI-assisted development (Claude Code).
 
+## Live demo
+
+- App: https://library-management-system-umber-pi.vercel.app
+- API docs (Swagger UI): https://library-management-api-95gp.onrender.com/swagger-ui.html
+
+The API runs on a free instance that sleeps when idle, so the first request after a quiet period can take about a minute.
+
 ## Lending rules
 
 - A member can borrow a book only while a copy is available.
@@ -100,6 +107,17 @@ cd frontend && npm ci && npx ng serve
 | `DB_URL` | `jdbc:postgresql://localhost:5432/library` |
 | `DB_USERNAME` / `DB_PASSWORD` | `library` / `library` |
 | `LIBRARY_TIMEZONE` | `Africa/Cairo` |
+| `PORT` | `8080` |
+
+### Deployment
+
+The live demo runs on free tiers:
+
+| Part | Host |
+|---|---|
+| Angular app | Vercel. `frontend/vercel.json` serves the build and forwards `/api` to the backend. |
+| REST API | Render, built from `backend/Dockerfile`. The service settings are also in `render.yaml` as a Render Blueprint. |
+| PostgreSQL | Neon |
 
 ## API
 
