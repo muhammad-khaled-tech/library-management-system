@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
@@ -46,10 +47,12 @@ class BookServiceTest {
 
     private final Author mahfouz = withId(new Author("Naguib Mahfouz"), 1L);
     private final Pageable firstPage = PageRequest.of(0, 20);
+    // What the service passes on: the same page with id added as a tiebreaker sort
+    private final Pageable firstPageById = PageRequest.of(0, 20, Sort.by("id"));
 
     @Test
     void searchMatchesQueryWhenGiven() {
-        when(bookRepository.search("palace", firstPage))
+        when(bookRepository.search("palace", firstPageById))
                 .thenReturn(new PageImpl<>(List.of(book(10L, ISBN, 3))));
 
         Page<BookResponse> result = bookService.search(" palace ", firstPage);
@@ -59,11 +62,11 @@ class BookServiceTest {
 
     @Test
     void searchReturnsAllBooksWhenQueryIsBlank() {
-        when(bookRepository.findAll(firstPage)).thenReturn(Page.empty());
+        when(bookRepository.findAll(firstPageById)).thenReturn(Page.empty());
 
         bookService.search(null, firstPage);
 
-        verify(bookRepository).findAll(firstPage);
+        verify(bookRepository).findAll(firstPageById);
     }
 
     @Test

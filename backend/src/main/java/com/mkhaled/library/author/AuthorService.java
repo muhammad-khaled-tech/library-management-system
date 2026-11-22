@@ -1,6 +1,7 @@
 package com.mkhaled.library.author;
 
 import com.mkhaled.library.book.BookRepository;
+import com.mkhaled.library.common.StablePaging;
 import com.mkhaled.library.common.exception.BusinessRuleException;
 import com.mkhaled.library.common.exception.ResourceNotFoundException;
 import org.springframework.data.domain.Page;
@@ -21,9 +22,10 @@ public class AuthorService {
     }
 
     public Page<AuthorResponse> search(String name, Pageable pageable) {
+        Pageable stable = StablePaging.withIdTiebreaker(pageable);
         Page<Author> authors = (name == null || name.isBlank())
-                ? authorRepository.findAll(pageable)
-                : authorRepository.findByNameContainingIgnoreCase(name.strip(), pageable);
+                ? authorRepository.findAll(stable)
+                : authorRepository.findByNameContainingIgnoreCase(name.strip(), stable);
         return authors.map(AuthorResponse::from);
     }
 

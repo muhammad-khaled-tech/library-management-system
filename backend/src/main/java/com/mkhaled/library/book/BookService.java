@@ -2,6 +2,7 @@ package com.mkhaled.library.book;
 
 import com.mkhaled.library.author.Author;
 import com.mkhaled.library.author.AuthorRepository;
+import com.mkhaled.library.common.StablePaging;
 import com.mkhaled.library.common.exception.BusinessRuleException;
 import com.mkhaled.library.common.exception.ResourceNotFoundException;
 import com.mkhaled.library.loan.LoanRepository;
@@ -27,9 +28,10 @@ public class BookService {
     }
 
     public Page<BookResponse> search(String query, Pageable pageable) {
+        Pageable stable = StablePaging.withIdTiebreaker(pageable);
         Page<Book> books = (query == null || query.isBlank())
-                ? bookRepository.findAll(pageable)
-                : bookRepository.search(query.strip(), pageable);
+                ? bookRepository.findAll(stable)
+                : bookRepository.search(query.strip(), stable);
         return books.map(BookResponse::from);
     }
 

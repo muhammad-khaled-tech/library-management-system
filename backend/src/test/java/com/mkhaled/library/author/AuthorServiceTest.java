@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
@@ -37,11 +38,13 @@ class AuthorServiceTest {
     private AuthorService authorService;
 
     private final Pageable firstPage = PageRequest.of(0, 20);
+    // What the service passes on: the same page with id added as a tiebreaker sort
+    private final Pageable firstPageById = PageRequest.of(0, 20, Sort.by("id"));
 
     @Test
     void searchFiltersByNameWhenGiven() {
         Page<Author> page = new PageImpl<>(List.of(author(1L, "Naguib Mahfouz")));
-        when(authorRepository.findByNameContainingIgnoreCase("mahf", firstPage)).thenReturn(page);
+        when(authorRepository.findByNameContainingIgnoreCase("mahf", firstPageById)).thenReturn(page);
 
         Page<AuthorResponse> result = authorService.search("mahf", firstPage);
 
@@ -50,11 +53,11 @@ class AuthorServiceTest {
 
     @Test
     void searchReturnsAllAuthorsWhenNameIsBlank() {
-        when(authorRepository.findAll(firstPage)).thenReturn(Page.empty());
+        when(authorRepository.findAll(firstPageById)).thenReturn(Page.empty());
 
         authorService.search("  ", firstPage);
 
-        verify(authorRepository).findAll(firstPage);
+        verify(authorRepository).findAll(firstPageById);
     }
 
     @Test

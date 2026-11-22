@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
@@ -35,15 +36,17 @@ class MemberServiceTest {
     private MemberService memberService;
 
     private final Pageable firstPage = PageRequest.of(0, 20);
+    // What the service passes on: the same page with id added as a tiebreaker sort
+    private final Pageable firstPageById = PageRequest.of(0, 20, Sort.by("id"));
 
     @Test
     void searchMatchesNameOrEmail() {
-        when(memberRepository.findByFullNameContainingIgnoreCaseOrEmailContainingIgnoreCase("sara", "sara", firstPage))
+        when(memberRepository.findByFullNameContainingIgnoreCaseOrEmailContainingIgnoreCase("sara", "sara", firstPageById))
                 .thenReturn(Page.empty());
 
         memberService.search(" sara ", firstPage);
 
-        verify(memberRepository).findByFullNameContainingIgnoreCaseOrEmailContainingIgnoreCase("sara", "sara", firstPage);
+        verify(memberRepository).findByFullNameContainingIgnoreCaseOrEmailContainingIgnoreCase("sara", "sara", firstPageById);
     }
 
     @Test

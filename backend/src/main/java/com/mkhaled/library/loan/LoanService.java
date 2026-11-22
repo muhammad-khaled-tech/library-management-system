@@ -2,6 +2,7 @@ package com.mkhaled.library.loan;
 
 import com.mkhaled.library.book.Book;
 import com.mkhaled.library.book.BookRepository;
+import com.mkhaled.library.common.StablePaging;
 import com.mkhaled.library.common.exception.BusinessRuleException;
 import com.mkhaled.library.common.exception.ResourceNotFoundException;
 import com.mkhaled.library.member.Member;
@@ -42,7 +43,8 @@ public class LoanService {
 
     public Page<LoanResponse> search(LoanSearchCriteria criteria, Pageable pageable) {
         LocalDate today = LocalDate.now(clock);
-        return loanRepository.findAll(LoanSpecifications.matching(criteria, today), pageable)
+        Pageable stable = StablePaging.withIdTiebreaker(pageable);
+        return loanRepository.findAll(LoanSpecifications.matching(criteria, today), stable)
                 .map(loan -> LoanResponse.from(loan, today));
     }
 

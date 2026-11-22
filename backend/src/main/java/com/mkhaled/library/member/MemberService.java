@@ -1,5 +1,6 @@
 package com.mkhaled.library.member;
 
+import com.mkhaled.library.common.StablePaging;
 import com.mkhaled.library.common.exception.BusinessRuleException;
 import com.mkhaled.library.common.exception.ResourceNotFoundException;
 import com.mkhaled.library.loan.LoanRepository;
@@ -23,12 +24,13 @@ public class MemberService {
     }
 
     public Page<MemberResponse> search(String query, Pageable pageable) {
+        Pageable stable = StablePaging.withIdTiebreaker(pageable);
         if (query == null || query.isBlank()) {
-            return memberRepository.findAll(pageable).map(MemberResponse::from);
+            return memberRepository.findAll(stable).map(MemberResponse::from);
         }
         String term = query.strip();
         return memberRepository
-                .findByFullNameContainingIgnoreCaseOrEmailContainingIgnoreCase(term, term, pageable)
+                .findByFullNameContainingIgnoreCaseOrEmailContainingIgnoreCase(term, term, stable)
                 .map(MemberResponse::from);
     }
 

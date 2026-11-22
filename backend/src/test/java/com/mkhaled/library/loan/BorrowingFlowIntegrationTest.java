@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.time.Clock;
 import java.time.LocalDate;
 
+import static org.hamcrest.Matchers.contains;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -100,6 +101,23 @@ class BorrowingFlowIntegrationTest {
                 .andExpect(jsonPath("$.detail").value("Member " + member + " already has 3 active loans (limit is 3)"));
         mockMvc.perform(get("/api/books/{id}", books[3]))
                 .andExpect(jsonPath("$.availableCopies").value(1));
+    }
+
+    @Test
+    void loansFromTheSameDayAreListedNewestFirst() throws Exception {
+        long authorId = createAuthor("Radwa Ashour");
+        long member = createMember("Hana Mostafa", "hana.flow@example.com");
+        String[] isbns = {"9780000000019", "9780000000026", "9780000000033"};
+        int[] loans = new int[isbns.length];
+        for (int i = 0; i < isbns.length; i++) {
+            long book = createBook(isbns[i], "Same Day " + i, 1, authorId);
+            loans[i] = (int) idOf(borrow(book, member));
+        }
+
+        mockMvc.perform(get("/api/loans")
+                        .param("memberId", String.valueOf(member))
+                        .param("sort", "borrowedOn,desc"))
+                .andExpect(jsonPath("$.content[*].id").value(contains(loans[2], loans[1], loans[0])));
     }
 
     private ResultActions borrow(long bookId, long memberId) throws Exception {
