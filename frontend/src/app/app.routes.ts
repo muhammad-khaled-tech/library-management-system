@@ -11,6 +11,11 @@ export const routes: Routes = [
     title: 'Authors',
     loadComponent: () => import('./authors/author-list').then((m) => m.AuthorList),
   },
+  {
+    path: 'members',
+    title: 'Members',
+    loadComponent: () => import('./members/member-list').then((m) => m.MemberList),
+  },
   { path: '', pathMatch: 'full', redirectTo: 'books' },
   { path: '**', redirectTo: '' },
 ];

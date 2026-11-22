@@ -1,0 +1,60 @@
+<div class="page-header">
+  <h1>Members</h1>
+  <button mat-flat-button (click)="add()">
+    <mat-icon>add</mat-icon>
+    Add member
+  </button>
+</div>
+
+<mat-form-field appearance="outline" class="search">
+  <mat-label>Search by name or email</mat-label>
+  <input matInput [formControl]="search" />
+  <mat-icon matSuffix>search</mat-icon>
+</mat-form-field>
+
+@if (list.page(); as page) {
+  <table
+    mat-table
+    [dataSource]="page.content"
+    matSort
+    matSortActive="fullName"
+    matSortDirection="asc"
+    (matSortChange)="list.changeSort($event)"
+  >
+    <ng-container matColumnDef="fullName">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+      <td mat-cell *matCellDef="let member">{{ member.fullName }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="email">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
+      <td mat-cell *matCellDef="let member">{{ member.email }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let member" class="actions">
+        <button mat-icon-button aria-label="Edit member" (click)="edit(member)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button aria-label="Delete member" (click)="remove(member)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columns"></tr>
+    <tr mat-row *matRowDef="let row; columns: columns"></tr>
+    <tr class="mat-mdc-row" *matNoDataRow>
+      <td class="mat-mdc-cell empty" [attr.colspan]="columns.length">No members found</td>
+    </tr>
+  </table>
+
+  <mat-paginator
+    [length]="page.page.totalElements"
+    [pageIndex]="page.page.number"
+    [pageSize]="page.page.size"
+    [pageSizeOptions]="[10, 20, 50]"
+    (page)="list.changePage($event)"
+  />
+}
