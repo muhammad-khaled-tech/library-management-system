@@ -41,10 +41,6 @@ body {
   margin-top: 16px;
 }
 
-.full-width {
-  width: 100%;
-}
-
 td.actions {
   text-align: right;
   white-space: nowrap;
@@ -53,4 +49,25 @@ td.actions {
 td.empty {
   padding: 16px;
   color: var(--mat-sys-on-surface-variant);
+}
+
+td.none-left {
+  color: var(--mat-sys-error);
+  font-weight: 500;
+}
+
+// Extra top padding so the outlined field's floating label isn't clipped by the dialog edge
+.mat-mdc-dialog-content.form-grid {
+  display: flex;
+  flex-direction: column;
+  padding-top: 8px;
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
 }

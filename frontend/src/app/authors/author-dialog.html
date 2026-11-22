@@ -1,8 +1,8 @@
 <h2 mat-dialog-title>{{ author ? 'Edit author' : 'Add author' }}</h2>
 
 <form [formGroup]="form" (ngSubmit)="save()">
-  <mat-dialog-content>
-    <mat-form-field appearance="outline" class="full-width">
+  <mat-dialog-content class="form-grid">
+    <mat-form-field appearance="outline">
       <mat-label>Name</mat-label>
       <input matInput formControlName="name" maxlength="150" cdkFocusInitial />
       @if (form.controls.name.hasError('maxlength')) {

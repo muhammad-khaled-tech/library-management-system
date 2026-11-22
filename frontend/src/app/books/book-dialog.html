@@ -1,0 +1,51 @@
+<h2 mat-dialog-title>{{ book ? 'Edit book' : 'Add book' }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content class="form-grid">
+    <mat-form-field appearance="outline">
+      <mat-label>ISBN-13</mat-label>
+      <input matInput formControlName="isbn" placeholder="978-0-306-40615-7" />
+      @if (form.controls.isbn.hasError('required')) {
+        <mat-error>ISBN is required</mat-error>
+      } @else {
+        <mat-error>Not a valid ISBN-13</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Title</mat-label>
+      <input matInput formControlName="title" maxlength="255" />
+      <mat-error>Title is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Author</mat-label>
+      <input matInput formControlName="author" [matAutocomplete]="authorPicker" />
+      <mat-autocomplete #authorPicker [displayWith]="authorName">
+        @for (author of authors$ | async; track author.id) {
+          <mat-option [value]="author">{{ author.name }}</mat-option>
+        }
+      </mat-autocomplete>
+      <mat-error>Pick an author from the list</mat-error>
+    </mat-form-field>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Published year</mat-label>
+        <input matInput type="number" formControlName="publishedYear" />
+        <mat-error>Between 1 and {{ currentYear }}</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Total copies</mat-label>
+        <input matInput type="number" formControlName="totalCopies" min="1" />
+        <mat-error>At least 1 copy</mat-error>
+      </mat-form-field>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancel</button>
+    <button mat-flat-button type="submit" [disabled]="saving()">Save</button>
+  </mat-dialog-actions>
+</form>
