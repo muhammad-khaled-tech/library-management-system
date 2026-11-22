@@ -29,5 +29,12 @@ services:
       postgres:
         condition: service_healthy
 
+  frontend:
+    build: ./frontend
+    ports:
+      - "4200:8080"
+    depends_on:
+      - backend
+
 volumes:
   postgres-data:
