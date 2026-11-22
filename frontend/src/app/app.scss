@@ -1,0 +1,14 @@
+mat-toolbar {
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+}
+
+.brand {
+  font: var(--mat-sys-title-large);
+}
+
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
