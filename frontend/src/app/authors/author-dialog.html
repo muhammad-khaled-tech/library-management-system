@@ -1,0 +1,20 @@
+<h2 mat-dialog-title>{{ author ? 'Edit author' : 'Add author' }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" maxlength="150" cdkFocusInitial />
+      @if (form.controls.name.hasError('maxlength')) {
+        <mat-error>At most 150 characters</mat-error>
+      } @else {
+        <mat-error>Name is required</mat-error>
+      }
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancel</button>
+    <button mat-flat-button type="submit" [disabled]="saving()">Save</button>
+  </mat-dialog-actions>
+</form>

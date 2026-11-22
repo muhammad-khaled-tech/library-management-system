@@ -1,10 +1,22 @@
 mat-toolbar {
+  gap: 24px;
   background: var(--mat-sys-primary);
   color: var(--mat-sys-on-primary);
 }
 
 .brand {
   font: var(--mat-sys-title-large);
+}
+
+nav a {
+  color: var(--mat-sys-on-primary);
+  opacity: 0.8;
+
+  &.active {
+    opacity: 1;
+    text-decoration: underline;
+    text-underline-offset: 6px;
+  }
 }
 
 main {

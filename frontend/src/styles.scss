@@ -22,3 +22,35 @@ body {
   margin: 0;
   height: 100%;
 }
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  h1 {
+    font: var(--mat-sys-headline-small);
+    margin: 0;
+  }
+}
+
+.search {
+  width: 100%;
+  max-width: 420px;
+  margin-top: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+td.actions {
+  text-align: right;
+  white-space: nowrap;
+}
+
+td.empty {
+  padding: 16px;
+  color: var(--mat-sys-on-surface-variant);
+}
