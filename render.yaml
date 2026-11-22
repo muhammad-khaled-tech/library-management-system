@@ -1,0 +1,19 @@
+# Render Blueprint for the backend API (free web service built from backend/Dockerfile).
+# The database runs on Neon; Render asks for the three DB_* values when the Blueprint is created.
+services:
+  - type: web
+    name: library-management-api
+    runtime: docker
+    plan: free
+    region: frankfurt
+    rootDir: backend
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
