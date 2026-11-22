@@ -1,0 +1,87 @@
+<div class="page-header">
+  <h1>Loans</h1>
+  <button mat-flat-button (click)="borrow()">
+    <mat-icon>add</mat-icon>
+    Borrow book
+  </button>
+</div>
+
+<mat-button-toggle-group class="status-filter" [formControl]="status" aria-label="Filter by status">
+  <mat-button-toggle value="">All</mat-button-toggle>
+  <mat-button-toggle value="ACTIVE">Active</mat-button-toggle>
+  <mat-button-toggle value="OVERDUE">Overdue</mat-button-toggle>
+  <mat-button-toggle value="RETURNED">Returned</mat-button-toggle>
+</mat-button-toggle-group>
+
+@if (list.page(); as page) {
+  <table
+    mat-table
+    [dataSource]="page.content"
+    matSort
+    matSortActive="borrowedOn"
+    matSortDirection="desc"
+    (matSortChange)="list.changeSort($event)"
+  >
+    <ng-container matColumnDef="book">
+      <th mat-header-cell *matHeaderCellDef>Book</th>
+      <td mat-cell *matCellDef="let loan">{{ loan.bookTitle }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="member">
+      <th mat-header-cell *matHeaderCellDef>Member</th>
+      <td mat-cell *matCellDef="let loan">{{ loan.memberName }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="borrowedOn">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Borrowed</th>
+      <td mat-cell *matCellDef="let loan">{{ loan.borrowedOn }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="dueDate">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Due</th>
+      <td mat-cell *matCellDef="let loan">{{ loan.dueDate }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="returnedOn">
+      <th mat-header-cell *matHeaderCellDef>Returned</th>
+      <td mat-cell *matCellDef="let loan">{{ loan.returnedOn ?? '—' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="lateFee">
+      <th mat-header-cell *matHeaderCellDef>Late fee</th>
+      <td mat-cell *matCellDef="let loan">
+        {{ loan.lateFee === null ? '—' : (loan.lateFee | number: '1.2-2') }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef>Status</th>
+      <td mat-cell *matCellDef="let loan">
+        <span class="status" [class]="loan.status.toLowerCase()">{{ loan.status }}</span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let loan" class="actions">
+        @if (loan.status !== 'RETURNED') {
+          <button mat-stroked-button (click)="returnLoan(loan)">Return</button>
+        }
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columns"></tr>
+    <tr mat-row *matRowDef="let row; columns: columns"></tr>
+    <tr class="mat-mdc-row" *matNoDataRow>
+      <td class="mat-mdc-cell empty" [attr.colspan]="columns.length">No loans found</td>
+    </tr>
+  </table>
+
+  <mat-paginator
+    [length]="page.page.totalElements"
+    [pageIndex]="page.page.number"
+    [pageSize]="page.page.size"
+    [pageSizeOptions]="[10, 20, 50]"
+    (page)="list.changePage($event)"
+  />
+}

@@ -1,0 +1,52 @@
+<h2 mat-dialog-title>Borrow book</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content class="form-grid">
+    <mat-form-field appearance="outline">
+      <mat-label>Book</mat-label>
+      <input
+        matInput
+        formControlName="book"
+        [matAutocomplete]="bookPicker"
+        placeholder="Title, author or ISBN"
+      />
+      <mat-autocomplete #bookPicker [displayWith]="bookTitle">
+        @for (book of books$ | async; track book.id) {
+          <mat-option [value]="book" [disabled]="book.availableCopies === 0">
+            {{ book.title }} — {{ book.authorName }}
+            <small class="option-hint">
+              {{
+                book.availableCopies === 0 ? 'no copies left' : book.availableCopies + ' available'
+              }}
+            </small>
+          </mat-option>
+        }
+      </mat-autocomplete>
+      <mat-error>Pick a book from the list</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Member</mat-label>
+      <input
+        matInput
+        formControlName="member"
+        [matAutocomplete]="memberPicker"
+        placeholder="Name or email"
+      />
+      <mat-autocomplete #memberPicker [displayWith]="memberName">
+        @for (member of members$ | async; track member.id) {
+          <mat-option [value]="member">
+            {{ member.fullName }}
+            <small class="option-hint">{{ member.email }}</small>
+          </mat-option>
+        }
+      </mat-autocomplete>
+      <mat-error>Pick a member from the list</mat-error>
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancel</button>
+    <button mat-flat-button type="submit" [disabled]="saving()">Borrow</button>
+  </mat-dialog-actions>
+</form>
